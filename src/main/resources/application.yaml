@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: consumer
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: message-server
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
+
+app:
+  kafka:
+    topics:
+      booking-created: booking.created
+      booking-cancelled: booking.cancelled
