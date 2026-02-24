@@ -18,12 +18,14 @@ import org.springframework.stereotype.Component;
 public class BookingEventListener {
 
 	private static final Logger log = LoggerFactory.getLogger(BookingEventListener.class);
+	private final BookingEventOrderingGuard orderingGuard;
 
 	@KafkaListener(topics = {
 		"${app.kafka.topics.booking-created}"
 	})
 	public void onBookingCreated(@Payload BookingCreatedEvent event,
 		@Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
+		orderingGuard.checkAndUpdate(event.bookingId(), event.eventTimestamp());
 		log.info("Booking created. topic={}, event={}", topic, event);
 	}
 
@@ -35,10 +37,12 @@ public class BookingEventListener {
 		backOff = @BackOff(
 			delay = 1000,
 			multiplier = 2
-		)
+		),
+		exclude = MonotonicityViolationException.class
 	)
 	public void onBookingCancelled(@Payload BookingCancelledEvent event,
 		@Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
+		orderingGuard.checkAndUpdate(event.bookingId(), event.eventTimestamp());
 		log.info("Booking cancelled. topic={}, event={}", topic, event);
 	}
 }

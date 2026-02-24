@@ -6,8 +6,11 @@ spring:
     consumer:
       group-id: message-server
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       auto-offset-reset: earliest
+      properties:
+        spring.json.trusted.packages: com.example.consumer.kafka.dto
+        spring.json.use.type.headers: true
 
 app:
   kafka:
